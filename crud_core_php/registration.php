@@ -2,7 +2,39 @@
     session_start();
     require_once 'db_connection.php';
     if(isset($_POST['submit-btn'])){
-
+        $path = 'uploads/';
+        $extension = pathinfo($_FILES['profile_pic']['name'],PATHINFO_EXTENSION);
+        $file_name = $_FILES['profile_pic']['name'] .'.'.$extension;
+        // $file_name = $_FILES['profile_pic']['name'] .'_'. date('YmdHis');
+        $profile = (file_exists($_FILES['profile_pic']['tmp_name'])) ? $file_name : '';
+        $insert_data = [
+            'first_name' =>$_POST['first_name'],
+            'last_name' =>$_POST['last_name'],
+            'email' =>$_POST['email'],
+            'username' =>$_POST['username'],
+            'password' =>$_POST['password'],
+            'mobile_number' =>$_POST['contact'],
+            'gender' =>$_POST['gender'],
+            'address' =>$_POST['address'],
+            'state' =>$_POST['state'],
+            'profile_picture' =>$profile,
+            'hobbies' =>implode("','",$_POST['hobbies']),
+        ];
+        $cols = implode(',', array_keys($insert_data));
+        $vals = implode("','", array_values($insert_data));
+        echo $sql = "INSERT INTO users ($cols) VALUES ('$vals')";die;
+        $insert = $conn->query($sql);
+        if($insert){
+            if(!is_null($profile)){
+                move_uploaded_file($_FILES['profile_pic']['tmp_name'],$path.$file_name);
+            }
+            echo '<div class="alert alert-success" role="alert">Data inserted successfully.</div>';
+        }else{
+            echo '<div class="alert alert-danger" role="alert">Something went wrong.</div>';
+            header("refresh:3;url:registration.php");
+        }
+        // echo '<pre>';
+        // print_r($insert_data);die;
     }
 ?>
 <!DOCTYPE html>
@@ -118,7 +150,7 @@
                 <div class="col-md-12">
                     <div class="card login-card">
                         <div class="card-body">
-                            <form action="register.php" method="POST" enctype="multipart/form-data">
+                            <form action="registration.php" method="POST" enctype="multipart/form-data">
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="first_name">First Name</label>
@@ -145,15 +177,15 @@
                                         <input type="password" class="form-control" id="password" name="password" required>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="confirm_password">Confirm Password</label>
-                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
                                         <label for="contact">Contact Number</label>
                                         <input type="tel" class="form-control" id="contact" name="contact" required>
                                     </div>
+                                    <!-- <div class="form-group col-md-6">
+                                        <label for="confirm_password">Confirm Password</label>
+                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                    </div> -->
+                                </div>
+                                <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label>Gender</label>
                                         <div class="form-check">
@@ -175,8 +207,8 @@
                                         <label for="state">State</label>
                                         <select class="form-control" id="state" name="state" required>
                                             <option value="">Select State</option>
-                                            <option value="state1">Andhra Pradesh</option>
-                                            <option value="state2">Telangana</option>
+                                            <option value="andhra pradesh">Andhra Pradesh</option>
+                                            <option value="telangana">Telangana</option>
                                         </select>
                                     </div>
                                     <div class="form-group col-md-6">
