@@ -1,3 +1,17 @@
+<?php
+    session_start();
+    require_once 'db_connection.php';
+    if(!isset($_SESSION['user_data'])){
+        header('Location:login.php');
+    }
+    $sql = "SELECT * FROM users";
+    $exec = $conn->query($sql);
+    // $users = mysqli_fetch_all($exec, MYSQLI_ASSOC);
+    while ($data = $exec->fetch_object()) {
+        $users[] = $data;
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,9 +91,9 @@
             <h1 class="text-2xl font-bold">
                 <!-- <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c9462ab0-a728-41b3-9a31-381e45dac6d4.png" alt="Contact Management System logo with modern minimalist design in white text" /> -->
             </h1>
-            <button id="logoutBtn" class="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-all btn-hover">
+            <a id="logoutBtn" name="logout-btn" class="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-all btn-hover" href="logout.php">
                 <i class="fas fa-sign-out-alt mr-2"></i>Logout
-            </button>
+            </a>
         </div>
     </header>
  
@@ -87,9 +101,9 @@
         <!-- Page title and actions -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <h2 class="text-2xl font-semibold text-gray-800 mb-4 md:mb-0">Users List</h2>
-            <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-all btn-hover">
+            <a class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-all btn-hover" href="registration.php">
                 <i class="fas fa-plus mr-2"></i>Add User
-            </button>
+            </a>
         </div>
 
         <!-- Contacts table -->
@@ -98,75 +112,67 @@
                 <table class="min-w-full responsive-table">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sno</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hobbies</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <!-- Sample contact 1 -->
+                        <?php
+                            $sno = 1;
+                            if(isset($users)){
+                            foreach ($users as $user) {
+                        ?>
                         <tr class="hover:bg-gray-50 transition-all">
+                            <td data-label="id" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $sno ?></td>
                             <td data-label="Name" class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/dc43c13d-8fad-490b-bb97-e17621dbf513.png" alt="Portrait of John Doe, a professional business man with short hair and smiling face" />
+                                        <img class="h-10 w-10 rounded-full" src="<?= 'uploads/'.$user->profile_picture ?>" alt="Portrait of John Doe, a professional business man with short hair and smiling face" /> 
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">John Doe</div>
-                                        <div class="text-sm text-gray-500">Director</div>
+                                        <div class="text-sm font-medium text-gray-900"><?= $user->first_name .' '. $user->last_name ?></div>
+                                        <!-- <div class="text-sm text-gray-500">Director</div> -->
                                     </div>
                                 </div>
                             </td>
-                            <td data-label="Phone" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">(555) 123-4567</td>
-                            <td data-label="Email" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">john.doe@example.com</td>
+                            <td data-label="Phone" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?=$user->mobile_number ?></td>
+                            <td data-label="Email" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?=$user->email ?></td>
+                            <td data-label="Email" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?=$user->gender ?></td>
+                            <td data-label="Email" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?=$user->address ?></td>
+                            <td data-label="Email" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?=$user->state ?></td>
+                            <td data-label="Email" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?=$user->hobbies ?></td>
                             <td data-label="Actions" class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button class="text-indigo-600 hover:text-indigo-900 edit-btn" onclick="editContact(1)">
+                                    <a class="text-indigo-600 hover:text-indigo-900 edit-btn" href="registration.php?id=<?= $user->id ?>">
+                                        <!-- onclick="editContact(1)" -->
                                         <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="text-red-600 hover:text-red-900 delete-btn" onclick="deleteContact(1)">
+                                    </a>
+                                     <!-- <a class="text-red-600 hover:text-red-900 delete-btn" href="delete.php?id=<?= $user->id ?>"> -->
+                                        <!-- onclick="deleteContact(1)" -->
+                                        <!-- <i class="fas fa-trash-alt"></i> -->
+                                    <!-- </a> -->
+                                     <button class="text-red-600 hover:text-red-900 delete-btn" onclick="deleteContact(<?= $user->id ?>)">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
-
-                        <!-- Sample contact 2 -->
-                        <tr class="hover:bg-gray-50 transition-all">
-                            <td data-label="Name" class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d7ff5e37-3874-465d-ae7a-432bab429227.png" alt="Portrait of Jane Smith, a professional woman with brown hair and glasses" />
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">Jane Smith</div>
-                                        <div class="text-sm text-gray-500">Manager</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td data-label="Phone" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">(555) 987-6543</td>
-                            <td data-label="Email" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">jane.smith@example.com</td>
-                            <td data-label="Actions" class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <button class="text-indigo-600 hover:text-indigo-900 edit-btn" onclick="editContact(2)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="text-red-600 hover:text-red-900 delete-btn" onclick="deleteContact(2)">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Add more contacts as needed -->
+                        <?php $sno++; }
+                    } ?>
                     </tbody>
                 </table>
             </div>
         </div>
 
         <!-- Pagination (optional) -->
-        <div class="mt-8 flex justify-between items-center">
+        <!-- <div class="mt-8 flex justify-between items-center">
             <div class="text-sm text-gray-500">
                 Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">20</span> entries
             </div>
@@ -174,7 +180,7 @@
                 <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all">Previous</button>
                 <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-all">Next</button>
             </div>
-        </div>
+        </div> -->
     </main>
 
     <!-- Confirmation Modal (hidden by default) -->
@@ -190,9 +196,9 @@
                             <i class="fas fa-exclamation-triangle text-red-600"></i>
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Delete Contact</h3>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Delete User</h3>
                             <div class="mt-2">
-                                <p class="text-sm text-gray-500">Are you sure you want to delete this contact? This action cannot be undone.</p>
+                                <p class="text-sm text-gray-500">Are you sure you want to delete this user? This action cannot be undone.</p>
                             </div>
                         </div>
                     </div>
@@ -213,7 +219,7 @@
         // Function to handle logout
         document.getElementById('logoutBtn').addEventListener('click', function() {
             // Add your logout logic here
-            alert('Logout functionality would be implemented here');
+            alert('Are you sure you want to logout.');
         });
 
         // Initialize variables
@@ -237,6 +243,27 @@
             if (currentDeleteId) {
                 alert(`Deleting contact with ID: ${currentDeleteId}`);
                 // Add your delete logic here (API call, etc.)
+                fetch('delete.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: currentDeleteId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('User  deleted successfully.');
+                        // Optionally, refresh the page or remove the user from the UI
+                        location.reload(); // Refresh the page
+                    } else {
+                        alert('Error deleting user: ' + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the user.');
+                });
                 document.getElementById('deleteModal').classList.add('hidden');
                 currentDeleteId = null;
             }
